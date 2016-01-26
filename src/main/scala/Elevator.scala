@@ -33,8 +33,7 @@ trait ElevatorSimulation {
 object DirectionFirstElevatorStrategy {
   def apply() = new DirectionFirstElevatorStrategy(List(Elevator(0)))
   def update(state: ElevatorState, e: Elevator, r: ElevatorRequest): ElevatorState = {
-    if (r.from.number < r.dest.number &&
-      r.from.number >= e.min.number &&
+    if (r.from.number >= e.min.number &&
       r.dest.number <= e.max.number) {
 
       if(state.execOrder.contains(r)){
@@ -52,15 +51,20 @@ object DirectionFirstElevatorStrategy {
         // and floors that go in different direction
         val (nextSteps, tail) = ori.partition { r =>
           direction match {
-            case ElevatorDirection.Up => r.from.number >= state.currentFloor.number
-            case ElevatorDirection.Down => r.from.number <= state.currentFloor.number
+            case ElevatorDirection.Up =>
+              (r.from.number - r.dest.number >= 0 ) && r.from.number >= state.currentFloor.number
+            case ElevatorDirection.Down =>
+              (r.from.number - r.dest.number <= 0 ) && r.from.number <= state.currentFloor.number
           }
         }
+
+        println(nextSteps, tail)
+
         def sortFn(d: ElevatorDirection.Value)(r1: ElevatorRequest, r2: ElevatorRequest): Boolean = {
           d match {
             // missing equality on purpose
-            case ElevatorDirection.Up => r1.from.number > state.currentFloor.number
-            case ElevatorDirection.Down => r.from.number < state.currentFloor.number
+            case ElevatorDirection.Up => r1.from.number > r2.from.number
+            case ElevatorDirection.Down => r.from.number < r2.from.number
           }
         }
         val (headFn, tailFn) = direction match {

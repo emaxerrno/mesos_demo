@@ -130,3 +130,34 @@ There is basic coverage for invalid input (incorrect floor numbers)
 There is also coverage floor directionality change (reached top/bottom floor).
 
 There is basic coverage for FIFO improvement.
+
+
+## Notes on immutability
+
+All of the basic data types are immutable. The only mutable reference is
+the pointer holding the system which needs to be swaped when computing
+the new state of the system.
+
+This allowed me to think of correctness first above performance.
+
+## Notes on testing
+
+Testing was straight forward, except for the case that we have to record the
+current floor on the `step()` function which is different from the instructions.
+
+When you `step()` the state machine you can't siply go into the destination
+floor of your next state, you have to first check if you have picked up the
+passenger at the requested floor.
+
+
+## Notes on time
+
+The first basic solution with a single elevator took 3h:20min.
+
+See this commit if you are interested in the basic form:
+
+``` 1e006b8 * Working basic version with unit tests ```
+
+The final solution with pluggable elevators took the full 4hrs allowed.
+
+The readme was written after the coding was done.

@@ -52,13 +52,13 @@ object DirectionFirstElevatorStrategy {
         val (nextSteps, tail) = ori.partition { r =>
           direction match {
             case ElevatorDirection.Up =>
-              (r.from.number - r.dest.number >= 0 ) && r.from.number >= state.currentFloor.number
+              (r.dest.number - r.from.number >= 0 ) && r.from.number >= state.currentFloor.number
             case ElevatorDirection.Down =>
-              (r.from.number - r.dest.number <= 0 ) && r.from.number <= state.currentFloor.number
+              (r.dest.number - r.from.number <= 0 ) && r.from.number <= state.currentFloor.number
           }
         }
 
-        println(nextSteps, tail)
+        // println("Next steps:", nextSteps, tail, direction, "current:", state.currentFloor)
 
         def sortFn(d: ElevatorDirection.Value)(r1: ElevatorRequest, r2: ElevatorRequest): Boolean = {
           d match {
@@ -88,27 +88,31 @@ object DirectionFirstElevatorStrategy {
     val ElevatorState(ori, exec, _, curr) = state
     exec match {
       case head :: tail =>
-        val dir = if(!tail.isEmpty){
-          state.direction match {
-            case ElevatorDirection.Up =>
-              val th = tail.head // head of tail
-              if(th.dest.number >= head.dest.number){
-                ElevatorDirection.Up
-              }else {
-                ElevatorDirection.Down
-              }
-            case ElevatorDirection.Down =>
-              val th = tail.head // head of tail
-              if(th.dest.number <= head.dest.number){
-                ElevatorDirection.Down
-              }else {
-                ElevatorDirection.Up
-              }
-          }
+        if (head.from != state.currentFloor){
+          state.copy(currentFloor = head.from)
         }else {
-          state.direction
+          val dir = if(!tail.isEmpty){
+            state.direction match {
+              case ElevatorDirection.Up =>
+                val th = tail.head // head of tail
+                if(th.dest.number >= head.dest.number){
+                  ElevatorDirection.Up
+                }else {
+                  ElevatorDirection.Down
+                }
+              case ElevatorDirection.Down =>
+                val th = tail.head // head of tail
+                if(th.dest.number <= head.dest.number){
+                  ElevatorDirection.Down
+                }else {
+                  ElevatorDirection.Up
+                }
+            }
+          }else {
+            state.direction
+          }
+          ElevatorState(ori.filterNot(_ ==  head), tail, dir, head.dest)
         }
-        ElevatorState(ori.filterNot(_ ==  head), tail, dir, curr)
       case Nil => state
     }
   }

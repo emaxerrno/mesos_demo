@@ -32,7 +32,7 @@ $ sbt test
 
 * What the user will/can see
 
-```
+```scala
 trait ElevatorControlSystem {
   def status(): Map[Elevator,ElevatorState]
   def pickup(src:Floor, dest: Floor)
@@ -41,7 +41,7 @@ trait ElevatorControlSystem {
 
 * The simulation system
 
-```
+```scala
 trait ElevatorSimulation {
   def update(e: Elevator, s: ElevatorRequest): Map[Elevator,ElevatorState]
   def step()
@@ -55,7 +55,7 @@ a Sequence for simpler/faster/cleaner lookup.
 At the moment the only strategy implemented is to take direction into account
 first.
 
-```
+```scala
 class DirectionFirstElevatorStrategy(val elevators: List[Elevator])
     extends ElevatorControlSystem with ElevatorSimulation {
   private val elevatorLoadDistribution_ = new Random
@@ -75,7 +75,7 @@ below on **The type system** for notes on the data types.
 
 The proposed solution wraps the basic integers into a fully typed system:
 
-```
+```scala
 case class Floor(val number: Int)
 
 case class Elevator(val id: Int,
@@ -110,7 +110,7 @@ The proposed improvement does not cover a better distribution among elevators.
 This is a low hanging fruit and would only affect one method without changing
 any of the rest of the logic. At the moment the load distribution is just random
 
-```
+```scala
   private val elevatorLoadDistribution_ = new Random
 ```
 
@@ -121,7 +121,7 @@ working system for the specs covered on the website.
 
 There is basic coverage for invalid input (incorrect floor numbers)
 
-```
+```scala
      ...
      ElevatorRequest(Floor(10000), Floor(333333)) // incorrect, above max
      ...
